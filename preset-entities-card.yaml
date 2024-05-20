@@ -1,0 +1,68 @@
+state_color: true
+show_header_toggle: false
+title: AREA Ночь
+type: entities
+entities:
+  - entity: switch.tion_preset_PRESET_0_mode_auto
+    name: Автоуправление
+  - type: conditional
+    conditions:
+      - condition: state
+        entity: switch.tion_preset_PRESET_0_mode_auto
+        state: 'on'
+    row:
+      entity: number.tion_preset_PRESET_0_co2
+      name: Целевой уровень CO₂
+  - type: conditional
+    conditions:
+      - condition: state
+        entity: switch.tion_preset_PRESET_0_mode_auto
+        state: 'on'
+    row:
+      type: section
+      label: Ограничение скорости
+  - type: conditional
+    conditions:
+      - condition: state
+        entity: switch.tion_preset_PRESET_0_mode_auto
+        state: 'on'
+    row:
+      entity: number.tion_preset_PRESET_0_speed_min_set
+      name: Минимальная
+  - type: conditional
+    conditions:
+      - condition: state
+        entity: switch.tion_preset_PRESET_0_mode_auto
+        state: 'on'
+    row:
+      entity: number.tion_preset_PRESET_0_speed_max_set
+      name: Максимальная
+  - type: conditional
+    conditions:
+      - condition: state
+        entity: switch.tion_preset_PRESET_0_mode_auto
+        state: 'off'
+    row:
+      type: section
+      label: Ручное управление
+  - type: conditional
+    conditions:
+      - condition: state
+        entity: switch.tion_preset_PRESET_0_mode_auto
+        state: 'off'
+    row:
+      entity: switch.tion_preset_PRESET_0_breezer_on
+      name: Включен
+  - type: conditional
+    conditions:
+      - condition: state
+        entity: switch.tion_preset_PRESET_0_mode_auto
+        state: 'off'
+    row:
+      entity: number.tion_preset_PRESET_0_speed
+      name: Скорость
+  - type: section
+  - entity: switch.tion_preset_PRESET_0_heater_on
+    name: Подогрев
+  - entity: number.tion_preset_PRESET_0_t_set
+    name: Температура
