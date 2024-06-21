@@ -1,6 +1,6 @@
 {
   "name": "ha-tion-card",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "The custom card for Tion integration in Home Assistant",
   "scripts": {
     "start": "rollup -c rollup.config.dev.js --watch",

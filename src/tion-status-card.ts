@@ -176,6 +176,7 @@ class TionStatusCard extends LitElement {
                                 demo_state: {state: "450.0", attributes: {unit_of_measurement: 'ppm'}},
                                 max: 2000,
                                 min: 0,
+                                fallbackState: '———',
                                 gradient: true,
                                 color_stops: {
                                     '0': '#62e51d',
@@ -193,6 +194,7 @@ class TionStatusCard extends LitElement {
                                     demo_state: {state: "25.0", attributes: {unit_of_measurement: '°C'}},
                                     max: 40,
                                     min: 0,
+                                    fallbackState: '——',
                                     color: '#ff6600',
                                 })
                         }
@@ -205,6 +207,7 @@ class TionStatusCard extends LitElement {
                                     demo_state: {state: "27.0", attributes: {unit_of_measurement: '%'}},
                                     max: 100,
                                     min: 0,
+                                    fallbackState: '——',
                                     color: '#00b5f2',
                                 })
                             }
@@ -218,8 +221,9 @@ class TionStatusCard extends LitElement {
                             model: 'Бризер O2'
                         },
                         module: {
-                            name: 'MagicAair',
+                            name: 'MagicAir',
                         },
+                        auto: false,
                         target_temp: 20,
                         target_co2: 700,
                         heat_on: true,
@@ -231,6 +235,7 @@ class TionStatusCard extends LitElement {
                     }: {
                         device: this._hass?.devices[this.config?.breezer_device||''],
                         module: this._hass?.devices[this.config?.module_device||''],
+                        auto: this._hass?.states[this.config?.entity_climate||''].attributes['mode'] === 'auto',
                         target_temp: Math.round(Number(this._hass?.states[this.config?.entity_climate||''].attributes['temperature'])),
                         target_co2: Math.round(Number(this._hass?.states[this.config?.entity_climate||''].attributes['target_co2'])),
                         heat_on: this._hass?.states[this.config?.entity_climate||''].state === 'heat',
@@ -258,6 +263,7 @@ class TionStatusCard extends LitElement {
         const temp_out = config.temp_out;
         const temp_out_unit = config.temp_out_unit;
         const heat_on = config.heat_on;
+        const auto = config.auto;
 
         return html`
             <div class="tion-module-info">
@@ -269,8 +275,13 @@ class TionStatusCard extends LitElement {
                     ${this._renderBreezerIcon(breezerModel)}
                 </div>
                 <div class="tion-breezer-info">
-                    <div class="tion-breezer-target-temp">
-                        <span>Подогрев до</span> ${target_temp}${temp_out_unit}
+                    <div class="tion-breezer-info-1">
+                        <div class="tion-breezer-auto">
+                            ${auto ? this._renderAutoIcon() : ''}
+                        </div>
+                        <div class="tion-breezer-target-temp">
+                            <span>Подогрев до</span> ${target_temp}${temp_out_unit}
+                        </div>
                     </div>
                     <div class="tion-breezer-speed">
                         ${[1,2,3,4,5].map( (it) => this._renderSpeedSegment(speed >=  it))}
@@ -370,16 +381,27 @@ class TionStatusCard extends LitElement {
         }
     }
 
+    private _renderAutoIcon() {
+        return html`
+            <svg width="300" height="140" viewBox="0 0 300.0 140.0" xmlns="http://www.w3.org/2000/svg">
+                <path stroke="#01b5f2" stroke-width="8" fill="#00000000" id="path1" d="M 70 10 a 60 60 0 0 0 0 120 h 160 a 60 60 0 0 0 0 -120 h -160 " />
+                <path fill="#01b5f2" d="m 108.64746,90 h -9.433593 l -3.75,-9.755859 H 78.295898 L 74.750977,90 H 65.551758 L 82.280273,47.050781 h 9.169922 z m -15.966796,-16.992188 -5.917969,-15.9375 -5.800781,15.9375 z M 113.18848,47.050781 h 8.67187 V 70.3125 q 0,5.537109 0.32227,7.177734 0.55664,2.636719 2.63672,4.248047 2.10937,1.582031 5.74218,1.582031 3.69141,0 5.56641,-1.49414 1.875,-1.523438 2.25586,-3.720703 0.38086,-2.197266 0.38086,-7.294922 V 47.050781 h 8.67187 v 22.558594 q 0,7.734375 -0.70312,10.927734 -0.70313,3.19336 -2.60742,5.390625 -1.875,2.197266 -5.03907,3.515625 -3.16406,1.289063 -8.26171,1.289063 -6.15235,0 -9.34571,-1.40625 -3.16406,-1.435547 -5.00976,-3.691406 -1.84571,-2.285157 -2.43164,-4.775391 -0.84961,-3.691406 -0.84961,-10.898438 z M 166.24512,90 V 54.316406 h -12.74414 v -7.265625 h 34.13086 v 7.265625 H 174.91699 V 90 Z m 24.14062,-21.210938 q 0,-6.5625 1.96289,-11.015625 1.46485,-3.28125 3.98438,-5.888671 2.54883,-2.607422 5.5664,-3.867188 4.01368,-1.699219 9.25782,-1.699219 9.49218,0 15.17578,5.888672 5.71289,5.888672 5.71289,16.376953 0,10.400391 -5.6543,16.289063 -5.6543,5.859375 -15.11719,5.859375 -9.58007,0 -15.23437,-5.830078 -5.6543,-5.859375 -5.6543,-16.113282 z m 8.93555,-0.292968 q 0,7.294922 3.36914,11.074218 3.36914,3.75 8.55469,3.75 5.18554,0 8.49609,-3.720703 3.33984,-3.75 3.33984,-11.220703 0,-7.382812 -3.25195,-11.015625 -3.22265,-3.632812 -8.58398,-3.632812 -5.36133,0 -8.64258,3.691406 -3.28125,3.662109 -3.28125,11.074219 z"
+                      id="text1"
+                      aria-label="AUTO" />
+            </svg>
+        `
+    }
+
     private renderCircle(config: {[key:string]: any}) {
         const state = config.demo ? config.demo_state : this._hass?.states[config?.entity||''] ?? undefined
-        const stateVal = state?.state ?? undefined
+        const stateVal = state?.state && state?.state != 'unknown' ? state?.state : 0
         const r = 200 * .45;
         const min = config.min || 0;
         const max = config.max || 100;
         const val = this._calculateValueBetween(min, max, stateVal ?? max);
         const score = val * 2 * Math.PI * r;
         const total = 10 * r;
-        const dashArray = `${score} ${total}`
+        const dashArray = state?.state && state?.state != 'unknown' ? `${score} ${total}` : `0 ${total}`;
 
         const stroke_color = config.color_stops ? this._calculateStrokeColor(stateVal, config.color_stops, config.gradient ?? false) : config.color;
 
@@ -481,7 +503,7 @@ class TionStatusCard extends LitElement {
                 <span class="labelContainer">
                   ${config.name != null ? html`<span class="name">${config.name}</span>` : ''}
                   <span class="value">
-                    <span class="text">${stateval ? stateval : '&mdash;'}</span>
+                    <span class="text">${stateval ? stateval : config.fallbackState}</span>
                     <span class="unit">${config.units ? config.units : (state?.attributes.unit_of_measurement || '')}</span>
                   </span>
                 </span>
@@ -607,6 +629,16 @@ class TionStatusCard extends LitElement {
             align-content: stretch;
             justify-content: space-between;
           }
+          .tion-breezer-info-1 {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            padding-left: 4cqw;
+          }
+          .tion-breezer-auto svg {
+            width: 15cqw;
+            height: auto;
+          }
           .tion-breezer-name {
             text-align: left;
             padding-left: 1em;
@@ -617,6 +649,7 @@ class TionStatusCard extends LitElement {
             padding-left: 1em;
             font-size: 4cqw;
           }
+          
           .tion-breezer-target-temp span{
             color: #999;
           }
