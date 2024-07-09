@@ -228,10 +228,13 @@ class TionStatusCard extends LitElement {
                         target_co2: 700,
                         heat_on: true,
                         speed: 1,
+                        speed_entity: null,
                         temp_in: -5,
                         temp_in_unit: '°C',
+                        temp_in_entity: null,
                         temp_out: 15,
                         temp_out_unit: '°C',
+                        temp_out_entity: null,
                     }: {
                         device: this._hass?.devices[this.config?.breezer_device||''],
                         module: this._hass?.devices[this.config?.module_device||''],
@@ -240,10 +243,13 @@ class TionStatusCard extends LitElement {
                         target_co2: Math.round(Number(this._hass?.states[this.config?.entity_climate||''].attributes['target_co2'])),
                         heat_on: this._hass?.states[this.config?.entity_climate||''].state === 'heat',
                         speed: Math.round(Number(this._hass?.states[this.config?.entity_fan_speed||''].state)),
+                        speed_entity: this.config?.entity_fan_speed,
                         temp_in: Math.round(Number(this._hass?.states[this.config?.entity_t_in||''].state)),
                         temp_in_unit: this._hass?.states[this.config?.entity_t_in||''].attributes['unit_of_measurement'],
+                        temp_in_entity: this.config?.entity_t_in,
                         temp_out: Math.round(Number(this._hass?.states[this.config?.entity_t_out||''].state)),
                         temp_out_unit: this._hass?.states[this.config?.entity_t_out||''].attributes['unit_of_measurement'],
+                        temp_out_entity: this.config?.entity_t_out,
                     })}
                 </div>
             </ha-card>
@@ -258,9 +264,12 @@ class TionStatusCard extends LitElement {
         const target_co2 = config.target_co2;
         const target_temp = config.target_temp;
         const speed = config.speed;
+        const speed_entity = config.speed_entity;
         const temp_in = config.temp_in;
+        const temp_in_entity = config.temp_in_entity;
         const temp_in_unit = config.temp_in_unit;
         const temp_out = config.temp_out;
+        const temp_out_entity = config.temp_out_entity;
         const temp_out_unit = config.temp_out_unit;
         const heat_on = config.heat_on;
         const auto = config.auto;
@@ -283,7 +292,7 @@ class TionStatusCard extends LitElement {
                             <span>Подогрев до</span> ${target_temp}${temp_out_unit}
                         </div>
                     </div>
-                    <div class="tion-breezer-speed">
+                    <div class="tion-breezer-speed" @click=${() => this._click_circle(speed_entity)}>
                         ${[1,2,3,4,5].map( (it) => this._renderSpeedSegment(speed >=  it))}
                     </div>
                     <div class="tion-breezer-name">
@@ -292,7 +301,7 @@ class TionStatusCard extends LitElement {
                 </div>
             </div>
             <div class="tion-temp-container">
-                <div class="temperature">${temp_in}${temp_in_unit}</div>
+                <div class="temperature" @click=${() => this._click_circle(temp_in_entity)}>${temp_in}${temp_in_unit}</div>
                 <div class="arrow-symbol">${this._renderArrow(false)}</div>
                 <div class="breezer-symbol">
                     <svg viewBox="0 0 22.0 26.0">
@@ -303,7 +312,7 @@ class TionStatusCard extends LitElement {
                     </svg>
                 </div>
                 <div class="arrow-symbol">${this._renderArrow(heat_on)}</div>
-                <div class="temperature">${temp_out}${temp_out_unit}</div>
+                <div class="temperature" @click=${() => this._click_circle(temp_out_entity)}>${temp_out}${temp_out_unit}</div>
             </div>
         `
     }
@@ -657,6 +666,7 @@ class TionStatusCard extends LitElement {
             display: flex;
             flex-wrap: nowrap;
             padding-left: 4cqw; 
+            cursor: pointer;
           }
           .tion-breezer-speed > svg {
             padding: 0.5cqw;
@@ -675,6 +685,7 @@ class TionStatusCard extends LitElement {
           }
           .tion-temp-container .temperature {
             font-size: 5cqw;
+            cursor: pointer;
           }
           .tion-temp-container .breezer-symbol {
             width: 6cqw;
